@@ -223,34 +223,34 @@ namespace atol_kassa_info
 			fptr_lib.queryData();
 			double СуммаВозвратовБН = fptr_lib.getParamDouble(Constants.LIBFPTR_PARAM_SUM);
 			
-			const string ФорматДесятичногоЧисла = "{0:0.00}";
+			const string ФДЧ = "{0:0.00}";
 			
-			data.SalesAmount = String.Format(ФорматДесятичногоЧисла, (СуммаПродажНал + СуммаПродажБН)); //Сумма продаж (чеки продажи)
-			data.RefundAmount = String.Format(ФорматДесятичногоЧисла, (СуммаВозвратовНал + СуммаВозвратовБН)); //Сумма возвратов (чеки возврата продажи)
-			data.CashSalesAmount = String.Format(ФорматДесятичногоЧисла, СуммаПродажНал); //Сумма продаж (наличными)
-			data.CashRefundAmount = String.Format(ФорматДесятичногоЧисла, СуммаВозвратовНал); //Сумма возвратов (наличными)
-			data.CashlessSalesAmount = String.Format(ФорматДесятичногоЧисла, СуммаПродажБН); //Сумма продаж (безнал)
-			data.CashlessRefundAmount = String.Format(ФорматДесятичногоЧисла, СуммаВозвратовБН); //Сумма возвратов (безнал)
+			data.SalesAmount 			= String.Format(ФДЧ, (СуммаПродажНал + СуммаПродажБН)); //Сумма продаж (чеки продажи)
+			data.RefundAmount 			= String.Format(ФДЧ, (СуммаВозвратовНал + СуммаВозвратовБН)); //Сумма возвратов (чеки возврата продажи)
+			data.CashSalesAmount 		= String.Format(ФДЧ, СуммаПродажНал); //Сумма продаж (наличными)
+			data.CashRefundAmount 		= String.Format(ФДЧ, СуммаВозвратовНал); //Сумма возвратов (наличными)
+			data.CashlessSalesAmount 	= String.Format(ФДЧ, СуммаПродажБН); //Сумма продаж (безнал)
+			data.CashlessRefundAmount 	= String.Format(ФДЧ, СуммаВозвратовБН); //Сумма возвратов (безнал)
 			
-			data.CreditSalesAmount = String.Format(ФорматДесятичногоЧисла, 0); //Сумма продаж (кредит)
-			data.CreditRefundAmount = String.Format(ФорматДесятичногоЧисла, 0); //Сумма возвратов (кредит)
-			data.CancelledReceiptsAmount = "Не поддерживается в данной версии"; //Сумма отмененных чеков
-			data.CancelledRefundsAmount = "Не поддерживается в данной версии"; //Сумма отмененных возвратов
+			data.CreditSalesAmount 			= String.Format(ФДЧ, 0); //Сумма продаж (кредит)
+			data.CreditRefundAmount 		= String.Format(ФДЧ, 0); //Сумма возвратов (кредит)
+			data.CancelledReceiptsAmount 	= "Не поддерживается в данной версии"; //Сумма отмененных чеков
+			data.CancelledRefundsAmount 	= "Не поддерживается в данной версии"; //Сумма отмененных возвратов
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_DATA_TYPE, Constants.LIBFPTR_DT_CASHIN_SUM);
 			fptr_lib.queryData();
 			double СуммаВнесений = fptr_lib.getParamDouble(Constants.LIBFPTR_PARAM_SUM);
-			data.DepositAmount = String.Format(ФорматДесятичногоЧисла, СуммаВнесений); //Сумма внесений
+			data.DepositAmount = String.Format(ФДЧ, СуммаВнесений); //Сумма внесений
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_DATA_TYPE, Constants.LIBFPTR_DT_CASHOUT_SUM);
 			fptr_lib.queryData();
 			double СуммаВыплат = fptr_lib.getParamDouble(Constants.LIBFPTR_PARAM_SUM);
-			data.PayoutAmount = String.Format(ФорматДесятичногоЧисла, СуммаВыплат); //Сумма выплат
+			data.PayoutAmount = String.Format(ФДЧ, СуммаВыплат); //Сумма выплат
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_DATA_TYPE, Constants.LIBFPTR_DT_CASH_SUM);
 			fptr_lib.queryData();
 			double СуммаНаличности = fptr_lib.getParamDouble(Constants.LIBFPTR_PARAM_SUM);
-			data.CashAmount = String.Format(ФорматДесятичногоЧисла, СуммаНаличности); //Сумма наличности
+			data.CashAmount = String.Format(ФДЧ, СуммаНаличности); //Сумма наличности
 			
 			data.RevenueAmount = "Не поддерживается в данной версии"; //Сумма выручки
 
@@ -258,9 +258,9 @@ namespace atol_kassa_info
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_DATA_TYPE, Constants.LIBFPTR_DT_SHIFT_STATE);
 			fptr_lib.queryData();
-			uint КодСостоянияСмены	= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_SHIFT_STATE);
-			uint НомерТекущейСмены	= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_SHIFT_NUMBER);
-			DateTime ДатаОкончанияСмены	= fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_DATE_TIME);
+			uint КодСостоянияСмены			= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_SHIFT_STATE);
+			uint НомерТекущейСмены			= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_SHIFT_NUMBER);
+			DateTime ДатаОкончанияСмены		= fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_DATE_TIME);
 			
 			string СостояниеСмены;
 			if (КодСостоянияСмены == Constants.LIBFPTR_SS_OPENED) {
@@ -271,16 +271,16 @@ namespace atol_kassa_info
 				СостояниеСмены = "Смена закрыта";
 			}
 			
-			data.ShiftStatus = СостояниеСмены; //Состояние смены
-			data.ShiftNumber = String.Format("{0:D}", НомерТекущейСмены); //Номер смены
-			data.ShiftExpirationTime = String.Format("{0:G}", ДатаОкончанияСмены); //Время истечения текущей смены
-			data.CashRegisterSerialNumber = НомерККТ; //Заводской номер ККМ
-			data.CurrentSessionNumber = String.Format("{0:D}", НомерТекущейСмены); //Текущий номер сессии
-			data.CurrentDocumentNumber = String.Format("{0:D}", ТекущийНомерДокумента); //Текущий номер документа
-			data.CashRegisterModelNumber = String.Format("{0:D}", НомерМодели); //Номер модели ККМ
-			data.CashRegisterName = ИмяМодели; //Наименование ККМ
-			data.CashRegisterVersion = ВерсияККМ; //Версия ККМ
-			data.DriverVersion = fptr_lib.version(); //Версия драйвера
+			data.ShiftStatus 				= СостояниеСмены; //Состояние смены
+			data.ShiftNumber 				= String.Format("{0:D}", НомерТекущейСмены); //Номер смены
+			data.ShiftExpirationTime 		= String.Format("{0:G}", ДатаОкончанияСмены); //Время истечения текущей смены
+			data.CashRegisterSerialNumber 	= НомерККТ; //Заводской номер ККМ
+			data.CurrentSessionNumber 		= String.Format("{0:D}", НомерТекущейСмены); //Текущий номер сессии
+			data.CurrentDocumentNumber 		= String.Format("{0:D}", ТекущийНомерДокумента); //Текущий номер документа
+			data.CashRegisterModelNumber 	= String.Format("{0:D}", НомерМодели); //Номер модели ККМ
+			data.CashRegisterName 			= ИмяМодели; //Наименование ККМ
+			data.CashRegisterVersion 		= ВерсияККМ; //Версия ККМ
+			data.DriverVersion 				= fptr_lib.version(); //Версия драйвера
 			
 			//Запрос версии прошивки
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_DATA_TYPE, Constants.LIBFPTR_DT_UNIT_VERSION);
@@ -309,19 +309,17 @@ namespace atol_kassa_info
  			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_ISM_EXCHANGE_STATUS);
 			fptr_lib.fnQueryData();
 
-			data.IsmExchangeStatus = String.Format(ФорматДесятичногоЧисла, 0); //Статус информационного обмена с ИСМ
-			data.PendingNotificationsCount = String.Format(ФорматДесятичногоЧисла, 0); //Кол-во непереданных уведомлений в ИСМ
-			data.FirstPendingNotificationDateTime = String.Format(ФорматДесятичногоЧисла, 0); //Дата и время первого непереданного уведомления в ИСМ
+			data.IsmExchangeStatus = String.Format(ФДЧ, 0); //Статус информационного обмена с ИСМ
+			data.PendingNotificationsCount = String.Format(ФДЧ, 0); //Кол-во непереданных уведомлений в ИСМ
+			data.FirstPendingNotificationDateTime = String.Format(ФДЧ, 0); //Дата и время первого непереданного уведомления в ИСМ
 			*/
 			data.IsmExchangeStatus = "";
 			data.PendingNotificationsCount = String.Format("{0:D}", 0);
 			data.FirstPendingNotificationDateTime = "01.01.1970";
 			
-			
 			//Запрос информации и статуса ФН
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_FN_INFO);
 			fptr_lib.fnQueryData();
-			
 			string СерийныйНомерФН		= fptr_lib.getParamString(Constants.LIBFPTR_PARAM_SERIAL_NUMBER);
 			string ВерсияФН				= fptr_lib.getParamString(Constants.LIBFPTR_PARAM_FN_VERSION);
 			uint КодСостоянияФН 		= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_FN_STATE);
@@ -384,17 +382,16 @@ namespace atol_kassa_info
 			string АдресРасчетов		= fptr_lib.getParamString(1009);
 			string ИННОрганизации		= fptr_lib.getParamString(1018);
 			string ИмяОрганизации		= fptr_lib.getParamString(1048);
-			string EmailОрганизации	= fptr_lib.getParamString(1117);
-			string РегНомерККТ		= fptr_lib.getParamString(1037);
-			string ИННОФД			= fptr_lib.getParamString(1017);
-			string НазваниеОФД		= fptr_lib.getParamString(1046);
+			string EmailОрганизации		= fptr_lib.getParamString(1117);
+			string РегНомерККТ			= fptr_lib.getParamString(1037);
+			string ИННОФД				= fptr_lib.getParamString(1017);
+			string НазваниеОФД			= fptr_lib.getParamString(1046);
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_ERRORS);
 			fptr_lib.fnQueryData();
-			
-			uint КодОшибкиСети	= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_NETWORK_ERROR);
+			uint КодОшибкиСети		= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_NETWORK_ERROR);
 			string ТекстОшибкиСети	= fptr_lib.getParamString(Constants.LIBFPTR_PARAM_NETWORK_ERROR_TEXT);
-			uint КодОшибкиОФД	= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_OFD_ERROR);
+			uint КодОшибкиОФД		= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_OFD_ERROR);
 			string ТекстОшибкиОФД	= fptr_lib.getParamString(Constants.LIBFPTR_PARAM_OFD_ERROR_TEXT);
 			
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_FFD_VERSIONS);
@@ -405,30 +402,41 @@ namespace atol_kassa_info
 			fptr_lib.fnQueryData();
 			DateTime СрокДействияФН = fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_DATE_TIME);
 			
-			data.FiscalStorageExpirationDate = String.Format(ФорматДесятичногоЧисла, 0); //Срок действия ФН
-			data.FiscalStorageSerialNumber = String.Format(ФорматДесятичногоЧисла, 0); //Серийный номер ФН
-			data.FiscalStorageVersion = String.Format(ФорматДесятичногоЧисла, 0); //Версия ФН
-			data.FiscalStorageType = String.Format(ФорматДесятичногоЧисла, 0); //Тип ФН
-			data.FiscalStorageStatus = String.Format(ФорматДесятичногоЧисла, 0); //Состояние ФН
-			data.FiscalStorageNotes = String.Format(ФорматДесятичногоЧисла, 0); //Замечания по ФН
-			data.Ffd_KKT_Version = String.Format(ФорматДесятичногоЧисла, 0); //Версия ФФД ККТ
-			data.NetworkError = String.Format(ФорматДесятичногоЧисла, 0); //Ошибка сети
-			data.OfdErrorMessage = String.Format(ФорматДесятичногоЧисла, 0); //Текст ошибки ОФД
-			data.OrganizationInn = String.Format(ФорматДесятичногоЧисла, 0); //ИНН организации
-			data.OrganizationName = String.Format(ФорматДесятичногоЧисла, 0); //Название организации
-			data.OrganizationEmail = String.Format(ФорматДесятичногоЧисла, 0); //EMAIL организации
-			data.SettlementAddress = String.Format(ФорматДесятичногоЧисла, 0); //Адрес места расчетов
-			data.DeviceRegistrationNumber = String.Format(ФорматДесятичногоЧисла, 0); //Регистрационный номер устройства
+			data.FiscalStorageExpirationDate 	= String.Format("{0:G}", СрокДействияФН); //Срок действия ФН
+			data.FiscalStorageSerialNumber 		= СерийныйНомерФН; //Серийный номер ФН
+			data.FiscalStorageVersion 			= ВерсияФН; //Версия ФН
+			data.FiscalStorageType 				= ТипФН; //Тип ФН
+			data.FiscalStorageStatus 			= СостояниеФН; //Состояние ФН
+			data.FiscalStorageNotes 			= СтрокаЗамечаний; //Замечания по ФН
+			data.Ffd_KKT_Version 				= String.Format("{0:D}", ВерсияФФДККТ); //Версия ФФД ККТ
+			data.NetworkError 					= String.Format("{0:D}:{1}", КодОшибкиСети, ТекстОшибкиСети); //Ошибка сети
+			data.OfdErrorMessage 				= String.Format("{0:D}:{1}", КодОшибкиОФД, ТекстОшибкиОФД); //Текст ошибки ОФД
+			data.OrganizationInn 				= ИННОрганизации; //ИНН организации
+			data.OrganizationName 				= ИмяОрганизации; //Название организации
+			data.OrganizationEmail 				= EmailОрганизации; //EMAIL организации
+			data.SettlementAddress 				= АдресРасчетов; //Адрес места расчетов
+			data.DeviceRegistrationNumber 		= РегНомерККТ; //Регистрационный номер устройства
 			
-			data.OfdInn = String.Format(ФорматДесятичногоЧисла, 0); //ИНН ОФД
-			data.OfdName = String.Format(ФорматДесятичногоЧисла, 0); //Название ОФД
-			data.FfdVersion = String.Format(ФорматДесятичногоЧисла, 0); //Версия ФФД
+			data.OfdInn 		= ИННОФД; //ИНН ОФД
+			data.OfdName 		= НазваниеОФД; //Название ОФД
+			data.FfdVersion 	= ВерсияФФД; //Версия ФФД
 			
-			data.LastFiscalDocumentNumber = String.Format(ФорматДесятичногоЧисла, 0); //Последний документ в ФН: номер
-			data.LastFiscalDocumentDateTime = String.Format(ФорматДесятичногоЧисла, 0); //Последний документ в ФН: дата-время
-			data.LastFiscalDocumentAmount = String.Format(ФорматДесятичногоЧисла, 0); //Последний документ в ФН: сумма
-			data.LastFiscalDocumentFiscalSign = String.Format(ФорматДесятичногоЧисла, 0); //Последний документ в ФН: фискальный признак
-			data.CashRegisterSelfTest = String.Format(ФорматДесятичногоЧисла, 0); //Проверка КМ средствами драйвера
+			//Запрос информации о последнем чеке
+			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_LAST_RECEIPT);
+			fptr_lib.fnQueryData();
+			uint ПДФННомер 		= fptr_lib.getParamInt(Constants.LIBFPTR_PARAM_DOCUMENT_NUMBER);
+			double ПДФНСумма 	= fptr_lib.getParamDouble(Constants.LIBFPTR_PARAM_RECEIPT_SUM);
+			string ПДФНПризнак 	= fptr_lib.getParamString(Constants.LIBFPTR_PARAM_FISCAL_SIGN);
+			DateTime ПДФНДата 	= fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_DATE_TIME);
+			
+			data.LastFiscalDocumentNumber 		= String.Format("{0:D}", ПДФННомер); //Последний документ в ФН: номер
+			data.LastFiscalDocumentDateTime 	= String.Format("{0:G}", ПДФНДата); //Последний документ в ФН: дата-время
+			data.LastFiscalDocumentAmount 		= String.Format(ФДЧ, ПДФНСумма); //Последний документ в ФН: сумма
+			data.LastFiscalDocumentFiscalSign 	= ПДФНПризнак; //Последний документ в ФН: фискальный признак
+			
+			string ПроверкаКМ = fptr_lib.getSingleSetting(Constants.LIBFPTR_SETTING_VALIDATE_MARK_WITH_FNM_ONLY);
+			
+			data.CashRegisterSelfTest 			= ПроверкаКМ; //Проверка КМ средствами драйвера
 
 			fptr_lib.close();
 			fptr_lib.destroy();
@@ -547,33 +555,33 @@ namespace atol_kassa_info
 				
 				wr.WriteLine("Статус обмена с ОФД" + delim + DataStruct.OfdExchangeStatus);
 				wr.WriteLine("Кол-во неотправленных документов в ОФД" + delim + DataStruct.endingDocumentsCount);
-				wr.WriteLine("Дата и время первого не отправленного документа в ОФД" + delim);
-				wr.WriteLine("Дата и время последнего успешного обмена с ОФД" + delim);
-				wr.WriteLine("Статус информационного обмена с ИСМ" + delim);
-				wr.WriteLine("Кол-во непереданных уведомлений в ИСМ" + delim);
-				wr.WriteLine("Дата и время первого непереданного уведомления в ИСМ" + delim);
-				wr.WriteLine("Срок действия ФН" + delim);
-				wr.WriteLine("Серийный номер ФН" + delim);
-				wr.WriteLine("Версия ФН" + delim);
-				wr.WriteLine("Тип ФН" + delim);
-				wr.WriteLine("Состояние ФН" + delim);
-				wr.WriteLine("Замечания по ФН" + delim);
-				wr.WriteLine("Версия ФФД ККТ" + delim);
-				wr.WriteLine("Ошибка сети" + delim);
-				wr.WriteLine("Текст ошибки ОФД" + delim);
-				wr.WriteLine("ИНН организации" + delim);
-				wr.WriteLine("Название организации" + delim);
-				wr.WriteLine("EMAIL организации" + delim);
-				wr.WriteLine("Адрес места расчетов" + delim);
-				wr.WriteLine("Регистрационный номер устройства" + delim);
-				wr.WriteLine("ИНН ОФД" + delim);
-				wr.WriteLine("Название ОФД" + delim);
-				wr.WriteLine("Версия ФФД" + delim);
-				wr.WriteLine("Последний документ в ФН: номер" + delim);
-				wr.WriteLine("Последний документ в ФН: дата-время" + delim);
-				wr.WriteLine("Последний документ в ФН: сумма" + delim);
-				wr.WriteLine("Последний документ в ФН: фискальный признак" + delim);
-				wr.WriteLine("Проверка КМ средствами драйвера" + delim);
+				wr.WriteLine("Дата и время первого не отправленного документа в ОФД" + delim + DataStruct.FirstPendingDocumentDateTime);
+				wr.WriteLine("Дата и время последнего успешного обмена с ОФД" + delim + DataStruct.LastSuccessfulOfdExchangeDateTime);
+				wr.WriteLine("Статус информационного обмена с ИСМ" + delim + DataStruct.IsmExchangeStatus);
+				wr.WriteLine("Кол-во непереданных уведомлений в ИСМ" + delim + DataStruct.PendingNotificationsCount);
+				wr.WriteLine("Дата и время первого непереданного уведомления в ИСМ" + delim + DataStruct.FirstPendingNotificationDateTime);
+				wr.WriteLine("Срок действия ФН" + delim + DataStruct.FiscalStorageExpirationDate);
+				wr.WriteLine("Серийный номер ФН" + delim + DataStruct.FiscalStorageSerialNumber);
+				wr.WriteLine("Версия ФН" + delim + DataStruct.FiscalStorageVersion);
+				wr.WriteLine("Тип ФН" + delim + DataStruct.FiscalStorageType);
+				wr.WriteLine("Состояние ФН" + delim + DataStruct.FiscalStorageStatus);
+				wr.WriteLine("Замечания по ФН" + delim + DataStruct.FiscalStorageNotes);
+				wr.WriteLine("Версия ФФД ККТ" + delim + DataStruct.Ffd_KKT_Version);
+				wr.WriteLine("Ошибка сети" + delim + DataStruct.NetworkError);
+				wr.WriteLine("Текст ошибки ОФД" + delim + DataStruct.OfdErrorMessage);
+				wr.WriteLine("ИНН организации" + delim + DataStruct.OrganizationInn);
+				wr.WriteLine("Название организации" + delim + DataStruct.OrganizationName);
+				wr.WriteLine("EMAIL организации" + delim + DataStruct.OrganizationEmail);
+				wr.WriteLine("Адрес места расчетов" + delim + DataStruct.SettlementAddress);
+				wr.WriteLine("Регистрационный номер устройства" + delim + DataStruct.DeviceRegistrationNumber);
+				wr.WriteLine("ИНН ОФД" + delim + DataStruct.OfdInn);
+				wr.WriteLine("Название ОФД" + delim + DataStruct.OfdName);
+				wr.WriteLine("Версия ФФД" + delim + DataStruct.FfdVersion);
+				wr.WriteLine("Последний документ в ФН: номер" + delim + DataStruct.LastFiscalDocumentNumber);
+				wr.WriteLine("Последний документ в ФН: дата-время" + delim + DataStruct.LastFiscalDocumentDateTime);
+				wr.WriteLine("Последний документ в ФН: сумма" + delim + DataStruct.LastFiscalDocumentAmount);
+				wr.WriteLine("Последний документ в ФН: фискальный признак" + delim + DataStruct.LastFiscalDocumentFiscalSign);
+				wr.WriteLine("Проверка КМ средствами драйвера" + delim + DataStruct.CashRegisterSelfTest);
 			}
 			
 			return local_file_name;
