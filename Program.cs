@@ -7,11 +7,10 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Xml.Serialization;
 using System.Text;
-using System.Collections.Generic;
 using Atol.Drivers10.Fptr;
 
 namespace atol_kassa_info
@@ -21,8 +20,8 @@ namespace atol_kassa_info
 	{
 		
 		const string ConnectionTypeCom = "COM";
-		const string ConnectionTypeUsb = "USB"; 
-		
+		const string ConnectionTypeUsb = "USB";
+
 		[STAThread]
 		static void Main(string[] args)
 		{
@@ -103,21 +102,19 @@ namespace atol_kassa_info
 
 				var ini = new IniFile();
 				
-				//ini.PathToAtolDLL		= "C:\\Program Files\\Atol\\fptr10.dll";
 				ini.TypeOfConnection	= ConnectionTypeCom; //USB
 				ini.ComPortNumber 		= 3;
-				
-				ini.PathToPSCP 			= "B:\\PRG\\tmp\\atol\\pscp.exe";
 				
 				ini.FTP_Server 			= "88.147.147.82";
 				ini.FTP_Server_Port 	= 8021;
 				ini.FTP_User 			= "solarisdirect";
 				ini.FTP_Password 		= "127001#SolDirect";
-				ini.FTP_Directory		= "/Sirius_FN";
+				ini.FTP_Directory		= "Sirius_FN";
 				ini.FTP_PassiveMode		= true;
 				
 				ini.LocalDirectory 		= "B:\\PRG\\tmp\\atol";
-				ini.WarehouseName		= "2932:\"Сириус - А\" Петровск а/п 3, Московская 6";
+				ini.NodeCode			= "86";
+				ini.WarehouseName		= "\"Сириус - Саратов\", Саратов а/п 4, ул. Посадского";
 				
 				string path_empty_ini = Directory.GetCurrentDirectory() + "\\" + "sample_ini.xml";
 
@@ -169,6 +166,9 @@ namespace atol_kassa_info
 			
 			AtolData data;
 			
+			data.CurrStorage = String.Format("{0}:{1}", iniSet.NodeCode, iniSet.WarehouseName);
+			data.HOSTNAME = Environment.MachineName;
+			
 			if (iniSet.TypeOfConnection == ConnectionTypeCom) {
 				fptr_lib.setSingleSetting(Constants.LIBFPTR_SETTING_MODEL, Constants.LIBFPTR_MODEL_ATOL_AUTO.ToString());
 				fptr_lib.setSingleSetting(Constants.LIBFPTR_SETTING_PORT, Constants.LIBFPTR_PORT_COM.ToString());
@@ -181,9 +181,6 @@ namespace atol_kassa_info
 			}
 			
 			fptr_lib.applySingleSettings();
-			
-			data.CurrStorage = iniSet.WarehouseName;
-			data.HOSTNAME = Environment.MachineName;
 			
 			fptr_lib.open();
 			
@@ -300,10 +297,10 @@ namespace atol_kassa_info
 			DateTime ДатаНеотправлено   = fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_DATE_TIME);
 			DateTime ДатаОбмена         = fptr_lib.getParamDateTime(Constants.LIBFPTR_PARAM_LAST_SUCCESSFUL_OKP);
 			
-			data.OfdExchangeStatus = String.Format("{0:D}", СтатусОбмена); //Статус обмена с ОФД
-			data.endingDocumentsCount = String.Format("{0:D}", Неотправлено); //Кол-во неотправленных документов в ОФД
-			data.FirstPendingDocumentDateTime = String.Format("{0:G}", ДатаНеотправлено); //Дата и время первого не отправленного документа в ОФД
-			data.LastSuccessfulOfdExchangeDateTime = String.Format("{0:G}", ДатаОбмена); //Дата и время последнего успешного обмена с ОФД
+			data.OfdExchangeStatus 					= String.Format("{0:D}", СтатусОбмена); //Статус обмена с ОФД
+			data.endingDocumentsCount 				= String.Format("{0:D}", Неотправлено); //Кол-во неотправленных документов в ОФД
+			data.FirstPendingDocumentDateTime 		= String.Format("{0:G}", ДатаНеотправлено); //Дата и время первого не отправленного документа в ОФД
+			data.LastSuccessfulOfdExchangeDateTime 	= String.Format("{0:G}", ДатаОбмена); //Дата и время последнего успешного обмена с ОФД
 			
 			/*
  			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_ISM_EXCHANGE_STATUS);
@@ -313,9 +310,9 @@ namespace atol_kassa_info
 			data.PendingNotificationsCount = String.Format(ФДЧ, 0); //Кол-во непереданных уведомлений в ИСМ
 			data.FirstPendingNotificationDateTime = String.Format(ФДЧ, 0); //Дата и время первого непереданного уведомления в ИСМ
 			*/
-			data.IsmExchangeStatus = "";
-			data.PendingNotificationsCount = String.Format("{0:D}", 0);
-			data.FirstPendingNotificationDateTime = "01.01.1970";
+			data.IsmExchangeStatus 					= "";
+			data.PendingNotificationsCount 			= String.Format("{0:D}", 0);
+			data.FirstPendingNotificationDateTime 	= "01.01.1970";
 			
 			//Запрос информации и статуса ФН
 			fptr_lib.setParam(Constants.LIBFPTR_PARAM_FN_DATA_TYPE, Constants.LIBFPTR_FNDT_FN_INFO);
@@ -500,24 +497,34 @@ namespace atol_kassa_info
 			AtolData DataStruct = GetAtolInfo(iniSet);
 			
 			//сохраним структуру в текст в локальный каталог
-			string local_file_name = SaveDataToLocalDir(DataStruct, iniSet);
+			Files_To_Upload file_names = SaveDataToLocalDir(DataStruct, iniSet);
 			
 			//отправим его на ftp через pscp
-			SendFileToFTP(local_file_name, iniSet);
+			SendFileToFTP(file_names, iniSet);
 			
 		}
 		
-		static string SaveDataToLocalDir(AtolData DataStruct, IniFile iniSet)
+		static Files_To_Upload SaveDataToLocalDir(AtolData DataStruct, IniFile iniSet)
 		{
 			string local_file_name;
-			if (iniSet.LocalDirectory.EndsWith("\\", StringComparison.CurrentCultureIgnoreCase) == true) {
-				local_file_name = iniSet.LocalDirectory + "new_fn_1234.txt";
+			string short_name;
+			string addict_to_local_name;
+			
+			if (iniSet.LocalDirectory.EndsWith("\\", StringComparison.CurrentCultureIgnoreCase) == true)
+				addict_to_local_name = "";
+			else
+				addict_to_local_name = "\\";
+			
+			if (DataStruct.CashRegisterSerialNumber.Length == 0) {
+				short_name = "err_" + iniSet.NodeCode + "_" + String.Format("{0:yy-MM-dd-HH-mm-ss}", DateTime.Now) + ".txt";
 			} else {
-				local_file_name = iniSet.LocalDirectory + "\\new_fn_1234.txt";
+				short_name = "fn" + DataStruct.CashRegisterSerialNumber + ".txt";
 			}
 			
+			local_file_name = iniSet.LocalDirectory + addict_to_local_name + "\\" + short_name;
+			
 			const string delim = ":";
-			using (var wr = new StreamWriter(local_file_name, false, new UTF8Encoding(false))) {
+			using (var wr = new StreamWriter(local_file_name, false, Encoding.GetEncoding("windows-1251"))) {
 				wr.WriteLine("CurrStorage" + delim + DataStruct.CurrStorage);
 				wr.WriteLine("HOSTNAME" + delim + DataStruct.HOSTNAME);
 				
@@ -584,25 +591,64 @@ namespace atol_kassa_info
 				wr.WriteLine("Проверка КМ средствами драйвера" + delim + DataStruct.CashRegisterSelfTest);
 			}
 			
-			return local_file_name;
+			var res = new Files_To_Upload();
+			res.short_name 	= short_name;
+			res.full_name 	= local_file_name;
+			return res;
 		}
 		
-		static void SendFileToFTP(string local_file_name, IniFile iniSet)
+		static void SendFileToFTP(Files_To_Upload file_names, IniFile iniSet)
 		{
+			
+			string ftp_file_name = String.Format("ftp://{0}:{1:D}/{2}/{3}", iniSet.FTP_Server, iniSet.FTP_Server_Port, iniSet.FTP_Directory, file_names.short_name);
+			FtpWebRequest requestFTPUploader = (FtpWebRequest)WebRequest.Create(ftp_file_name);
+            requestFTPUploader.Credentials = new NetworkCredential(iniSet.FTP_User, iniSet.FTP_Password);
+            requestFTPUploader.Method = WebRequestMethods.Ftp.UploadFile;
+
+            FileInfo fileInfo = new FileInfo(file_names.full_name);
+            FileStream fileStream = fileInfo.OpenRead();
+
+            int bufferLength = 2048;
+            byte[] buffer = new byte[bufferLength];
+
+            try
+            {
+                Stream uploadStream = requestFTPUploader.GetRequestStream();
+                int contentLength = fileStream.Read(buffer, 0, bufferLength);
+
+                while (contentLength != 0)
+                {
+                    uploadStream.Write(buffer, 0, contentLength);
+                    contentLength = fileStream.Read(buffer, 0, bufferLength);
+                }
+
+                uploadStream.Close();
+                fileStream.Close();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message.ToString());
+            }
+			
 		}
-		
 		
 	}
 
 	#region Объявления структур данных
 	
+	public struct Files_To_Upload
+	{
+		public string short_name;
+		public string full_name;
+	}
+		
 	public struct IniFile
 	{
 		//public string PathToAtolDLL;
 		public string TypeOfConnection;
 		public int ComPortNumber;
 		
-		public string PathToPSCP;
+		//public string PathToPSCP;
 		
 		public string FTP_Server;
 		public int FTP_Server_Port;
@@ -613,6 +659,7 @@ namespace atol_kassa_info
 		
 		public string LocalDirectory;
 		public string WarehouseName;
+		public string NodeCode;
 		
 	}
 	
@@ -622,68 +669,125 @@ namespace atol_kassa_info
 		public string CurrStorage;
 		public string HOSTNAME;
 		
-		public string SalesAmount; //Сумма продаж (чеки продажи)
-		public string RefundAmount; //Сумма возвратов (чеки возврата продажи)
-		public string CashSalesAmount; //Сумма продаж (наличными)
-		public string CashRefundAmount; //Сумма возвратов (наличными)
-		public string CashlessSalesAmount; //Сумма продаж (безнал)
-		public string CashlessRefundAmount; //Сумма возвратов (безнал)
-		public string CreditSalesAmount; //Сумма продаж (кредит)
-		public string CreditRefundAmount; //Сумма возвратов (кредит)
-		public string CancelledReceiptsAmount; //Сумма отмененных чеков
-		public string CancelledRefundsAmount; //Сумма отмененных возвратов
-		public string DepositAmount; //Сумма внесений
-		public string PayoutAmount; //Сумма выплат
-		public string CashAmount; //Сумма наличности
-		public string RevenueAmount; //Сумма выручки
+		public string SalesAmount;
+		//Сумма продаж (чеки продажи)
+		public string RefundAmount;
+		//Сумма возвратов (чеки возврата продажи)
+		public string CashSalesAmount;
+		//Сумма продаж (наличными)
+		public string CashRefundAmount;
+		//Сумма возвратов (наличными)
+		public string CashlessSalesAmount;
+		//Сумма продаж (безнал)
+		public string CashlessRefundAmount;
+		//Сумма возвратов (безнал)
+		public string CreditSalesAmount;
+		//Сумма продаж (кредит)
+		public string CreditRefundAmount;
+		//Сумма возвратов (кредит)
+		public string CancelledReceiptsAmount;
+		//Сумма отмененных чеков
+		public string CancelledRefundsAmount;
+		//Сумма отмененных возвратов
+		public string DepositAmount;
+		//Сумма внесений
+		public string PayoutAmount;
+		//Сумма выплат
+		public string CashAmount;
+		//Сумма наличности
+		public string RevenueAmount;
+		//Сумма выручки
 		
-		public string CurrentDateTime; //Текущие дата и время
-		public string ShiftStatus; //Состояние смены
-		public string ShiftNumber; //Номер смены
-		public string ShiftExpirationTime; //Время истечения текущей смены
-		public string CashRegisterSerialNumber; //Заводской номер ККМ
-		public string CurrentSessionNumber; //Текущий номер сессии
-		public string CurrentDocumentNumber; //Текущий номер документа
-		public string CashRegisterModelNumber; //Номер модели ККМ
-		public string CashRegisterName; //Наименование ККМ
-		public string CashRegisterVersion; //Версия ККМ
-		public string DriverVersion; //Версия драйвера
-		public string FirmwareVersion; //Версия прошивки
-		public string ReleaseVersion; //Версия релиза
-		public string ReceiptWidth; //Ширина ленты (симв.)
+		public string CurrentDateTime;
+		//Текущие дата и время
+		public string ShiftStatus;
+		//Состояние смены
+		public string ShiftNumber;
+		//Номер смены
+		public string ShiftExpirationTime;
+		//Время истечения текущей смены
+		public string CashRegisterSerialNumber;
+		//Заводской номер ККМ
+		public string CurrentSessionNumber;
+		//Текущий номер сессии
+		public string CurrentDocumentNumber;
+		//Текущий номер документа
+		public string CashRegisterModelNumber;
+		//Номер модели ККМ
+		public string CashRegisterName;
+		//Наименование ККМ
+		public string CashRegisterVersion;
+		//Версия ККМ
+		public string DriverVersion;
+		//Версия драйвера
+		public string FirmwareVersion;
+		//Версия прошивки
+		public string ReleaseVersion;
+		//Версия релиза
+		public string ReceiptWidth;
+		//Ширина ленты (симв.)
 		
-		public string OfdExchangeStatus; //Статус обмена с ОФД
-		public string endingDocumentsCount; //Кол-во неотправленных документов в ОФД
-		public string FirstPendingDocumentDateTime; //Дата и время первого не отправленного документа в ОФД
-		public string LastSuccessfulOfdExchangeDateTime; //Дата и время последнего успешного обмена с ОФД
-		public string IsmExchangeStatus; //Статус информационного обмена с ИСМ
-		public string PendingNotificationsCount; //Кол-во непереданных уведомлений в ИСМ
-		public string FirstPendingNotificationDateTime; //Дата и время первого непереданного уведомления в ИСМ
+		public string OfdExchangeStatus;
+		//Статус обмена с ОФД
+		public string endingDocumentsCount;
+		//Кол-во неотправленных документов в ОФД
+		public string FirstPendingDocumentDateTime;
+		//Дата и время первого не отправленного документа в ОФД
+		public string LastSuccessfulOfdExchangeDateTime;
+		//Дата и время последнего успешного обмена с ОФД
+		public string IsmExchangeStatus;
+		//Статус информационного обмена с ИСМ
+		public string PendingNotificationsCount;
+		//Кол-во непереданных уведомлений в ИСМ
+		public string FirstPendingNotificationDateTime;
+		//Дата и время первого непереданного уведомления в ИСМ
 		
-		public string FiscalStorageExpirationDate; //Срок действия ФН
-		public string FiscalStorageSerialNumber; //Серийный номер ФН
-		public string FiscalStorageVersion; //Версия ФН
-		public string FiscalStorageType; //Тип ФН
-		public string FiscalStorageStatus; //Состояние ФН
-		public string FiscalStorageNotes; //Замечания по ФН
-		public string Ffd_KKT_Version; //Версия ФФД ККТ
-		public string NetworkError; //Ошибка сети
-		public string OfdErrorMessage; //Текст ошибки ОФД
-		public string OrganizationInn; //ИНН организации
-		public string OrganizationName; //Название организации
-		public string OrganizationEmail; //EMAIL организации
-		public string SettlementAddress; //Адрес места расчетов
-		public string DeviceRegistrationNumber; //Регистрационный номер устройства
+		public string FiscalStorageExpirationDate;
+		//Срок действия ФН
+		public string FiscalStorageSerialNumber;
+		//Серийный номер ФН
+		public string FiscalStorageVersion;
+		//Версия ФН
+		public string FiscalStorageType;
+		//Тип ФН
+		public string FiscalStorageStatus;
+		//Состояние ФН
+		public string FiscalStorageNotes;
+		//Замечания по ФН
+		public string Ffd_KKT_Version;
+		//Версия ФФД ККТ
+		public string NetworkError;
+		//Ошибка сети
+		public string OfdErrorMessage;
+		//Текст ошибки ОФД
+		public string OrganizationInn;
+		//ИНН организации
+		public string OrganizationName;
+		//Название организации
+		public string OrganizationEmail;
+		//EMAIL организации
+		public string SettlementAddress;
+		//Адрес места расчетов
+		public string DeviceRegistrationNumber;
+		//Регистрационный номер устройства
 		
-		public string OfdInn; //ИНН ОФД
-		public string OfdName; //Название ОФД
-		public string FfdVersion; //Версия ФФД
+		public string OfdInn;
+		//ИНН ОФД
+		public string OfdName;
+		//Название ОФД
+		public string FfdVersion;
+		//Версия ФФД
 		
-		public string LastFiscalDocumentNumber; //Последний документ в ФН: номер
-		public string LastFiscalDocumentDateTime; //Последний документ в ФН: дата-время
-		public string LastFiscalDocumentAmount; //Последний документ в ФН: сумма
-		public string LastFiscalDocumentFiscalSign; //Последний документ в ФН: фискальный признак
-		public string CashRegisterSelfTest; //Проверка КМ средствами драйвера
+		public string LastFiscalDocumentNumber;
+		//Последний документ в ФН: номер
+		public string LastFiscalDocumentDateTime;
+		//Последний документ в ФН: дата-время
+		public string LastFiscalDocumentAmount;
+		//Последний документ в ФН: сумма
+		public string LastFiscalDocumentFiscalSign;
+		//Последний документ в ФН: фискальный признак
+		public string CashRegisterSelfTest;
+		//Проверка КМ средствами драйвера
 		
 	}
 	
