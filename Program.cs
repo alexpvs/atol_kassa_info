@@ -105,10 +105,10 @@ namespace atol_kassa_info
 				ini.TypeOfConnection	= ConnectionTypeCom; //USB
 				ini.ComPortNumber 		= 3;
 				
-				ini.FTP_Server 			= "88.147.147.82";
+				ini.FTP_Server 			= "8.8.8.8";
 				ini.FTP_Server_Port 	= 8021;
-				ini.FTP_User 			= "solarisdirect";
-				ini.FTP_Password 		= "127001#SolDirect";
+				ini.FTP_User 			= "user_name";
+				ini.FTP_Password 		= "user_password";
 				ini.FTP_Directory		= "Sirius_FN";
 				ini.FTP_PassiveMode		= true;
 				
